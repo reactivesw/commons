@@ -6,6 +6,8 @@ buildscript {
         // for spring boot
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.1.RELEASE")
 
+        // for unit test code coverage  -- need to find a way to put it in its file
+        classpath('com.palantir:jacoco-coverage:0.4.0')
     }
 }
 apply plugin: 'java'
@@ -65,3 +67,4 @@ dependencies {
     testCompile('org.spockframework:spock-spring:1.0-groovy-2.4')
 
 }
+apply from: 'test_coverage.gradle'
