@@ -1,41 +1,43 @@
 package io.reactivesw.authentication;
 
 import io.reactivesw.exception.AuthFailedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.Assert;
+
+import java.util.List;
 
 /**
  * Created by umasuo on 17/2/6.
  * This provider provide an tool to check the authentication of the token.
  * default policy provider.
  */
-@Component
-public class AuthPolicyProvider {
-
-  /**
-   * logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(AuthPolicyProvider.class);
-
-  /**
-   * jwt tool.
-   */
-  @Autowired
-  private transient JwtUtil jwtUtil;
+public interface AuthPolicyProvider {
 
   /**
    * check the authentication of the token
    *
-   * @param tokenString
+   * @param subjectId subject Id, this can be: customer id, service id, anonymous id.
+   * @param token     token input.
    */
-  public void checkToken(String tokenString) {
-    Token token = jwtUtil.parseToken(tokenString);
+  default void checkToken(String subjectId, Token token) {
+    Assert.notNull(subjectId);
+    Assert.notNull(token);
+
+    // check if the token belong to the subject.
+    checkSubjectId(subjectId, token.getSubjectId());
     //check expire time
-    this.checkExpireTime(token.getGenerateTime(), token.getExpiresIn());
-    //TODO check scope
-    //TODO Maybe should check black list
+    checkExpireTime(token.getGenerateTime(), token.getExpiresIn());
+    // check if the token has the correct policy.
+    checkScope(token.getScopes());
+    //black list for disable a token.
+    checkBlackList(token.getTokenId());
+  }
+
+
+  default void checkSubjectId(String idInput, String idInToken) {
+    if (!StringUtils.equals(idInput, idInToken)) {
+      throw new AuthFailedException("Token is illegal：token not belong to " + idInput);
+    }
   }
 
   /**
@@ -44,7 +46,7 @@ public class AuthPolicyProvider {
    * @param generateTime token's generate time.
    * @param expireIn     duration that token can be legal.
    */
-  private void checkExpireTime(long generateTime, long expireIn) {
+  default void checkExpireTime(long generateTime, long expireIn) {
 
     //here we should consider about different time zone
     long curTime = System.currentTimeMillis();
@@ -54,4 +56,7 @@ public class AuthPolicyProvider {
     }
   }
 
+  void checkScope(List<Scope> scopes);
+
+  void checkBlackList(String tokenId);
 }

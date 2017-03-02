@@ -1,37 +1,47 @@
 package io.reactivesw.authentication;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
- * Created by umasuo on 16/11/21.
+ * Customer token
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonIgnoreProperties(ignoreUnknown = true)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class Token implements Serializable {
 
   /**
-   * customer id, service id, anonymous id.
+   * token id, each token has an unique id.
+   * This is an random uuid.
    */
-  @JsonProperty("subject_id")
+  public String tokenId;
+  /**
+   * subject id, this can be: customer id, service id, anonymous id.
+   */
   private String subjectId;
 
-  @JsonProperty("token_type")
+  /**
+   * king of token. it can be: customer, admin, employee, service, anonymous.
+   */
   private TokenType tokenType;
 
-  @JsonProperty("expires_in")
+  /**
+   * the token will be expires in this time.
+   */
   private long expiresIn;
 
-  @JsonProperty("generate_time")
+  /**
+   * the token generate time, usually be the sign in time.
+   */
   private long generateTime;
 
-  @JsonProperty("scope")
-  private String scope;
+  /**
+   * basic scopes for the token.
+   */
+  private List<Scope> scopes;
 
 }
 

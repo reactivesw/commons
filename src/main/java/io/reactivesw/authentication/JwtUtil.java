@@ -7,7 +7,10 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.Assert;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -21,13 +24,13 @@ public class JwtUtil {
   /**
    * jwt secret for generate or parse token. if not set, then throw error.
    */
-  @Value("${jwt.secret}")
+  @Value("${jwt.secret:QWERTYUIOPLKJHGFDSAZXCVBNM}")
   private String secret;
 
   /**
    * the default expires time for each token.
    */
-  @Value("${jwt.expiresin:7200000}")
+  @Value("${jwt.expires-in:7200000}")
   private Long expiresIn;
 
   /**
@@ -40,6 +43,17 @@ public class JwtUtil {
    * @return the User object extracted from specified token or null if a token is invalid.
    */
   public Token parseToken(String token) {
+    return JwtUtil.parseToken(secret, token);
+  }
+
+  /**
+   * static function for parse token.
+   *
+   * @param secret secret used.
+   * @param token  token.
+   * @return Token
+   */
+  public static Token parseToken(String secret, String token) {
     try {
       Claims body = Jwts.parser()
           .setSigningKey(secret)
@@ -48,6 +62,7 @@ public class JwtUtil {
 
       Token tk = new Token();
       tk.setTokenType(TokenType.getType(body.getSubject()));
+      tk.setTokenId((String) body.get("tokenId"));
       tk.setSubjectId((String) body.get("subjectId"));
       tk.setGenerateTime((Long) body.get("generateTime"));
       if (body.get("expiresIn") instanceof Integer) {
@@ -55,7 +70,7 @@ public class JwtUtil {
       } else {
         tk.setExpiresIn((Long) body.get("expiresIn"));
       }
-      tk.setScope((String) body.get("scope"));
+      tk.setScopes((List<Scope>) body.get("scopes"));
 
       return tk;
 
@@ -70,19 +85,34 @@ public class JwtUtil {
    * @param tokenType : customer token, service token, anonymous token
    * @param subjectId subject id String
    * @param expires   expires time
-   * @param scope     scope
+   * @param scopes    scope
    * @return String token
    */
-  public String generateToken(TokenType tokenType, String subjectId, long expires, String scope) {
+  public String generateToken(TokenType tokenType, String subjectId, long expires, List<Scope>
+      scopes) {
+    return JwtUtil.generateToken(tokenType, subjectId, expires, secret, scopes);
+  }
+
+  /**
+   * generate token.
+   *
+   * @param tokenType : customer token, service token, anonymous token
+   * @param subjectId subject id String
+   * @param expires   expires time
+   * @param scopes    scope
+   * @return String token
+   */
+  public static String generateToken(TokenType tokenType, String subjectId, long expires, String
+      secret, List<Scope> scopes) {
+    Assert.isTrue(expires > 0, "expires should have positive value");
+    Assert.notNull(secret);
+
     Claims claims = Jwts.claims().setSubject(tokenType.getValue());
+    claims.put("tokenId", UUID.randomUUID().toString());
     claims.put("subjectId", subjectId);
     claims.put("generateTime", System.currentTimeMillis());
-    if (expires > 0) {
-      claims.put("expiresIn", expires);
-    } else {
-      claims.put("expiresIn", expiresIn);
-    }
-    claims.put("scope", scope);// TODO set role or scope
+    claims.put("expiresIn", expires);
+    claims.put("scopes", scopes);
 
 
     return Jwts.builder()
@@ -98,7 +128,8 @@ public class JwtUtil {
    * @return String
    */
   public String generateServiceToken(String serviceName) {
-    return this.generateToken(TokenType.SERVICE, serviceName, Integer.MAX_VALUE, "");
+    return this.generateToken(TokenType.SERVICE, serviceName, Integer.MAX_VALUE,
+        new ArrayList<>());
   }
 
   /**
@@ -107,6 +138,7 @@ public class JwtUtil {
    * @return String anonymous token
    */
   public String generateAnonymousToken() {
-    return this.generateToken(TokenType.ANONYMOUS, UUID.randomUUID().toString(), 0, "");
+    return this.generateToken(TokenType.ANONYMOUS, UUID.randomUUID().toString(), 0,
+        new ArrayList<>());
   }
 }
