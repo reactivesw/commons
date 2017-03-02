@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Created by umasuo on 17/2/9.
  */
-public interface ExceptionHandler {
+public class ExceptionHandler {
 
   /**
    * logger.
@@ -34,7 +34,8 @@ public interface ExceptionHandler {
   /**
    * exception EXCEPTION_MAP.
    */
-  Map<Class<?>, HttpStatus> EXCEPTION_MAP = new ConcurrentHashMap<Class<?>, HttpStatus>() {
+  private Map<Class<?>, HttpStatus> EXCEPTION_MAP = new ConcurrentHashMap<Class<?>,
+      HttpStatus>() {
     {
       this.put(AlreadyExistException.class, HttpStatus.CONFLICT);
       this.put(AuthFailedException.class, HttpStatus.UNAUTHORIZED);
@@ -51,7 +52,7 @@ public interface ExceptionHandler {
   /**
    * exception that do not log.
    */
-  ImmutableList<?> OMITTED_EXCEPTIONS = ImmutableList
+  private ImmutableList<?> OMITTED_EXCEPTIONS = ImmutableList
       .of(AlreadyExistException.class,
           AuthFailedException.class,
           AuthInfoMissingException.class,
@@ -73,9 +74,9 @@ public interface ExceptionHandler {
    * @param ex       Exception
    * @return the input exception
    */
-  default Exception setResponse(HttpServletRequest request, HttpServletResponse response,
-                                Object obj,
-                                Exception ex) {
+  public Exception setResponse(HttpServletRequest request, HttpServletResponse response,
+                               Object obj,
+                               Exception ex) {
     // get the status
     HttpStatus status = EXCEPTION_MAP.get(ex.getClass());
     if (status == null) {
@@ -97,7 +98,7 @@ public interface ExceptionHandler {
    *
    * @param ex exception
    */
-  default void logException(HttpServletRequest request, HttpServletResponse response,
+  private void logException(HttpServletRequest request, HttpServletResponse response,
                             Object obj, HttpStatus status, Exception ex) {
     boolean shouldLog = !OMITTED_EXCEPTIONS.contains(ex.getClass());
     if (shouldLog) {

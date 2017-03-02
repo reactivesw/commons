@@ -16,6 +16,22 @@ public interface AuthPolicyProvider {
   /**
    * check the authentication of the token
    *
+   * @param token token input.
+   */
+  default void checkToken(Token token) {
+    Assert.notNull(token);
+
+    //check expire time
+    checkExpireTime(token.getGenerateTime(), token.getExpiresIn());
+    // check if the token has the correct policy.
+    checkScope(token.getScopes());
+    //black list for disable a token.
+    checkBlackList(token.getTokenId());
+  }
+
+  /**
+   * check the authentication of the token
+   *
    * @param subjectId subject Id, this can be: customer id, service id, anonymous id.
    * @param token     token input.
    */
@@ -32,7 +48,6 @@ public interface AuthPolicyProvider {
     //black list for disable a token.
     checkBlackList(token.getTokenId());
   }
-
 
   default void checkSubjectId(String idInput, String idInToken) {
     if (!StringUtils.equals(idInput, idInToken)) {
