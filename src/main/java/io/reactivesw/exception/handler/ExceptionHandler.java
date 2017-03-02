@@ -86,7 +86,7 @@ public interface ExceptionHandler {
     logException(request, response, obj, status, ex);
 
     response.setStatus(status.value());
-    response.setHeader("error message", ex.getMessage());
+    response.addHeader("ErrorMessage", ex.getMessage());
     response.setContentType(MediaType.APPLICATION_JSON.getType());
     return ex;
   }
