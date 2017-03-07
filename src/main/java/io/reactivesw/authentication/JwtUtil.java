@@ -90,6 +90,9 @@ public class JwtUtil {
    */
   public String generateToken(TokenType tokenType, String subjectId, long expires, List<Scope>
       scopes) {
+    if (expires <= 0) {
+      expires = expiresIn;
+    }
     return JwtUtil.generateToken(tokenType, subjectId, expires, secret, scopes);
   }
 
