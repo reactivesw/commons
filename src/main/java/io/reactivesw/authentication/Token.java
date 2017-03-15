@@ -3,13 +3,10 @@ package io.reactivesw.authentication;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Customer token
  */
-//@JsonIgnoreProperties(ignoreUnknown = true)
-//@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class Token implements Serializable {
 
@@ -18,6 +15,7 @@ public class Token implements Serializable {
    * This is an random uuid.
    */
   public String tokenId;
+
   /**
    * subject id, this can be: customer id, service id, anonymous id.
    */
@@ -29,19 +27,9 @@ public class Token implements Serializable {
   private TokenType tokenType;
 
   /**
-   * the token will be expires in this time.
-   */
-  private long expiresIn;
-
-  /**
    * the token generate time, usually be the sign in time.
    */
   private long generateTime;
-
-  /**
-   * basic scopes for the token.
-   */
-  private List<Scope> scopes;
 
 }
 
