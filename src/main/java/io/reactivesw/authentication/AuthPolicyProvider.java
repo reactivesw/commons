@@ -1,7 +1,6 @@
 package io.reactivesw.authentication;
 
 /**
- * Created by umasuo on 17/2/6.
  * This provider provide an tool to check the authentication of the token.
  * default policy provider.
  */

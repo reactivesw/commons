@@ -1,6 +1,5 @@
 package io.reactivesw.exception.handler;
 
-import com.google.common.collect.ImmutableList;
 import io.reactivesw.exception.AlreadyExistException;
 import io.reactivesw.exception.AuthFailedException;
 import io.reactivesw.exception.AuthInfoMissingException;
@@ -15,15 +14,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * Created by umasuo on 17/2/9.
- */
 public class ExceptionHandler {
 
   /**
@@ -52,18 +49,19 @@ public class ExceptionHandler {
   /**
    * exception that do not log.
    */
-  private ImmutableList<?> OMITTED_EXCEPTIONS = ImmutableList
-      .of(AlreadyExistException.class,
-          AuthFailedException.class,
-          AuthInfoMissingException.class,
-          ConflictException.class,
-          CreateResourceFailed.class,
-          ImmutableException.class,
-          NotExistException.class,
-          ParametersException.class,
-          PasswordErrorException.class
-      );
+  private ArrayList<Class> OMITTED_EXCEPTIONS = new ArrayList<>();
 
+  {
+    OMITTED_EXCEPTIONS.add(AlreadyExistException.class);
+    OMITTED_EXCEPTIONS.add(AuthFailedException.class);
+    OMITTED_EXCEPTIONS.add(AuthInfoMissingException.class);
+    OMITTED_EXCEPTIONS.add(ConflictException.class);
+    OMITTED_EXCEPTIONS.add(CreateResourceFailed.class);
+    OMITTED_EXCEPTIONS.add(ImmutableException.class);
+    OMITTED_EXCEPTIONS.add(NotExistException.class);
+    OMITTED_EXCEPTIONS.add(ParametersException.class);
+    OMITTED_EXCEPTIONS.add(PasswordErrorException.class);
+  }
 
   /**
    * set the error info that need to send back to the client.
@@ -88,6 +86,7 @@ public class ExceptionHandler {
 
     response.setStatus(status.value());
     response.addHeader("ErrorMessage", ex.getMessage());
+    //use the application_json_utf8_value
     response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
     return ex;
   }
