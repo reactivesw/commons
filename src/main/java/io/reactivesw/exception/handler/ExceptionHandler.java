@@ -88,7 +88,7 @@ public class ExceptionHandler {
 
     response.setStatus(status.value());
     response.addHeader("ErrorMessage", ex.getMessage());
-    response.setContentType(MediaType.APPLICATION_JSON.getType());
+    response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
     return ex;
   }
 
