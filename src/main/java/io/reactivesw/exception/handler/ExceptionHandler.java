@@ -6,6 +6,7 @@ import io.reactivesw.exception.AuthInfoMissingException;
 import io.reactivesw.exception.ConflictException;
 import io.reactivesw.exception.CreateResourceFailed;
 import io.reactivesw.exception.ImmutableException;
+import io.reactivesw.exception.InvalidTokenException;
 import io.reactivesw.exception.NotExistException;
 import io.reactivesw.exception.ParametersException;
 import io.reactivesw.exception.PasswordErrorException;
@@ -43,6 +44,7 @@ public class ExceptionHandler {
       this.put(NotExistException.class, HttpStatus.NOT_FOUND);
       this.put(ParametersException.class, HttpStatus.BAD_REQUEST);
       this.put(PasswordErrorException.class, HttpStatus.UNAUTHORIZED);
+      this.put(InvalidTokenException.class, HttpStatus.UNAUTHORIZED);
     }
   };
 
@@ -61,6 +63,7 @@ public class ExceptionHandler {
     OMITTED_EXCEPTIONS.add(NotExistException.class);
     OMITTED_EXCEPTIONS.add(ParametersException.class);
     OMITTED_EXCEPTIONS.add(PasswordErrorException.class);
+    OMITTED_EXCEPTIONS.add(InvalidTokenException.class);
   }
 
   /**
