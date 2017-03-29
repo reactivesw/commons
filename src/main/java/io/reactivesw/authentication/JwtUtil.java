@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.reactivesw.exception.InvalidTokenException;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -60,7 +61,7 @@ public class JwtUtil {
       return tk;
 
     } catch (JwtException | ClassCastException e) {
-      return null;
+      throw new InvalidTokenException("Token is invalid. token: " + token);
     }
   }
 
